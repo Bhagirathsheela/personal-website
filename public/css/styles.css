@@ -151,7 +151,7 @@ body {
     transition: all linear 0.15s;
     font-size: 20px;
     color: #23527c;
-    text-indent: 2em;
+    text-indent: 10em;
     text-decoration: none;
     padding: 31px 0;
     text-transform: uppercase;
@@ -164,6 +164,7 @@ body {
 .education_rows_title.focus {
     color: #23527c;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .education_rows:last-child .education_rows_title {
@@ -960,15 +961,28 @@ body {
     .main-nav li:nth-child(1) {
         border-top: 1px solid #fff;
     }
+        .wrapper {
+            margin-top: 100px;
+            margin-bottom: 50px;
+        }
+    
+        .flg-img {
+            width: 60px;
+        }
+        .education_rows_title{
+            padding: 15px;
+            font-size: 15px;
+            text-indent: 0;
+        }
 }
-@media (max-width:320px) {
+/* @media (max-width:320px) {
     .wrapper{margin-top: 100px;
         margin-bottom: 50px;}
  .flg-img{
    width: 60px;
  }
     
-}
+} */
 @media (min-width: 992px) {}
 
 @media (min-width: 1200px) {}
