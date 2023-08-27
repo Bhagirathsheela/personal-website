@@ -29,8 +29,7 @@ const Header = () => {
           </svg>
         </i>
       </span>
-      <a href="#" className="logo">
-      </a>
+      <a href="#" className="logo"></a>
       <ul className={`main-nav ${show ? "active-bar" : ""}`}>
         <li>
           <a
@@ -64,10 +63,7 @@ const Header = () => {
           </a>
         </li>
         <li>
-          <a
-            href="https://api.whatsapp.com/send?phone=9610928997"
-            className="nav-links"
-          >
+          <a href="https://wa.me/+919610928997" className="nav-links">
             Ping me on WhatsApp?
           </a>
         </li>
