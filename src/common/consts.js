@@ -75,7 +75,7 @@ export const projectsInfo = [
     intro:
       "Developed a foundational tic-tac-toe game using React Native, providing a hands-on learning experience with this technology.",
     linkBtnTxt: "TicTacToe",
-    link: "",
+    link: "https://play.google.com/store/apps/details?id=com.TicTocToe.myapp&pcampaignid=web_share",
   },
   {
     language: "Android, Java",
