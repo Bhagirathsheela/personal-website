@@ -524,7 +524,7 @@ body {
 
 /* custom arbitrary css start */
 .banner {
-    background: #fff url(../images/background.jpg);
+    background: #000 url(../images/background.jpg);
     overflow-x: hidden;
     overflow-y: hidden;
 }
