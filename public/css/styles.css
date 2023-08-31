@@ -529,7 +529,8 @@ body {
     overflow-y: hidden;
 }
 .banner_new{
-    background: url(../images//homepage_pic.jpg)no-repeat center;
+    /* background: url(../images//homepage_pic.jpg)no-repeat center; */
+    background: url(../images/pic2.jpg)no-repeat center;
     background-size: cover;
 }
 
