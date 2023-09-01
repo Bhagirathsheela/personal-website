@@ -1,5 +1,6 @@
-export function scrollIntoView(selectorQuery) {
-    console.log(selectorQuery)
+export function scrollIntoViews(selectorQuery) {
+    //console.log(selectorQuery);
+    
   const _elm = document.querySelector(selectorQuery);
   if (_elm) {
     _elm.scrollIntoView({
@@ -14,7 +15,7 @@ export const educationInfo = [
   {
     uniqueStateClass: "graduation",
     period: "2013 - 2017",
-    title: "Graduation in Computer Science & Engineering From NITK,Surathkal",
+    title: "Graduation in Computer Science & Engineering From NITK, Surathkal",
     expandedInfo: {
       title: "Projects",
       pointsList: [

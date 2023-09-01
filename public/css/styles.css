@@ -260,8 +260,7 @@ body {
 
 .flex_clild {
     width: 300px;
-    height: 300px;
-    /*  background-color: red; */
+        min-height: 350px;
     margin: 2em 0px;
     border: 1px solid #000;
     box-shadow: #3e3e3ec4 2px 2px 2px;
@@ -271,6 +270,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
+    height: 45vmin;
 }
 
 .flex_clild:hover {
@@ -980,14 +980,11 @@ body {
             text-indent: 0;
         }
 }
-/* @media (max-width:320px) {
-    .wrapper{margin-top: 100px;
-        margin-bottom: 50px;}
- .flg-img{
-   width: 60px;
- }
-    
-} */
-@media (min-width: 992px) {}
 
-@media (min-width: 1200px) {}
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+.flex_clild{flex: 0 0 calc(50% - 50px);}
+}
+
+@media screen and (min-width: 1024px) and (max-width: 1280px) {
+    .flex_clild{flex: 0 0 calc(33.33% - 33px);}
+}

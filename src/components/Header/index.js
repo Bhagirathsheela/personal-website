@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { scrollIntoView } from '../../common/consts';
+import { scrollIntoViews } from '../../common/consts';
 
 const Header = () => {
   const [show, setShow] = useState(false);
@@ -35,8 +35,9 @@ const Header = () => {
           <a
             href="#"
             className="nav-links"
-            onClick={() => {
-              scrollIntoView(".home");
+            onClick={(e) => {
+              e.preventDefault();
+              scrollIntoViews(".home");
             }}
           >
             Home
@@ -46,16 +47,18 @@ const Header = () => {
           <a
             href="#"
             className="nav-links"
-            onClick={() => {
-              scrollIntoView(".about");
+            onClick={(e) => {
+              e.preventDefault();
+              scrollIntoViews(".skills");
             }}
           >
-            About
+            Projects
           </a>
         </li>
         <li
-          onClick={() => {
-            scrollIntoView(".custom_footer");
+          onClick={(e) => {
+            e.preventDefault();
+            scrollIntoViews(".custom_footer");
           }}
         >
           <a href="#" className="nav-links">
