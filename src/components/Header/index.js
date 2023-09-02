@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { scrollIntoViews } from '../../common/consts';
+import React, { useState } from "react";
+import { scrollIntoViews } from "../../consts";
+
 
 const Header = () => {
   const [show, setShow] = useState(false);
@@ -38,6 +39,7 @@ const Header = () => {
             onClick={(e) => {
               e.preventDefault();
               scrollIntoViews(".home");
+              setShow(!show);
             }}
           >
             Home
@@ -50,6 +52,7 @@ const Header = () => {
             onClick={(e) => {
               e.preventDefault();
               scrollIntoViews(".skills");
+              setShow(!show);
             }}
           >
             Projects
@@ -59,6 +62,7 @@ const Header = () => {
           onClick={(e) => {
             e.preventDefault();
             scrollIntoViews(".custom_footer");
+            setShow(!show);
           }}
         >
           <a href="#" className="nav-links">
@@ -73,6 +77,6 @@ const Header = () => {
       </ul>
     </nav>
   );
-}
+};
 
-export default Header
+export default Header;

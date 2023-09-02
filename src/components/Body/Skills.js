@@ -1,5 +1,5 @@
-import React from 'react'
-import { projectsInfo } from '../../common/consts';
+import React from "react";
+import { projectsInfo } from "../../consts";
 
 const Skills = () => {
   return (
@@ -18,7 +18,7 @@ const Skills = () => {
             <p className="intro_txt">{value.intro}</p>
 
             <button
-              title={value.link === ""?"discontinued":""}
+              title={value.link === "" ? "discontinued" : ""}
               className={`link_btn ${value.link === "" ? " disabled" : ""}`}
               onClick={() => {
                 value.link !== "" && window.open(value.link, "_blank");
@@ -26,7 +26,8 @@ const Skills = () => {
             >
               {value.linkBtnTxt}
               <span className="right_arrow">
-                <svg className='right_arrow_svg'
+                <svg
+                  className="right_arrow_svg"
                   width="20px"
                   height="20px"
                   viewBox="0 0 24 24"
@@ -56,6 +57,6 @@ const Skills = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Skills
+export default Skills;

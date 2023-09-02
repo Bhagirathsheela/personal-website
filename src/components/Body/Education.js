@@ -1,23 +1,23 @@
-import React,{useState} from 'react'
-import { educationInfo } from '../../common/consts';
-import Skills from './Skills';
+import React, { useState } from "react";
+import { educationInfo } from "../../consts";
+import Skills from "./Skills";
 
 const Education = () => {
-    const [showList, setShowList] = useState({
-      graduation: false,
-      higherSecondary: false,
-      highSchool :false,
-    });
- function updateListClass(value){
-     if(value==="graduation"){
-      setShowList({...showList,graduation:!showList.graduation})
-     }else if (value === "higherSecondary") {
-       setShowList({ ...showList, higherSecondary: !showList.higherSecondary });
-     } else {
-       setShowList({ ...showList, highSchool: !showList.highSchool });
-     }
-    console.log(showList,"show list")
- }     
+  const [showList, setShowList] = useState({
+    graduation: false,
+    higherSecondary: false,
+    highSchool: false,
+  });
+  function updateListClass(value) {
+    if (value === "graduation") {
+      setShowList({ ...showList, graduation: !showList.graduation });
+    } else if (value === "higherSecondary") {
+      setShowList({ ...showList, higherSecondary: !showList.higherSecondary });
+    } else {
+      setShowList({ ...showList, highSchool: !showList.highSchool });
+    }
+    console.log(showList, "show list");
+  }
   return (
     <div className="career_container">
       <div className="career_container_inner">
@@ -111,6 +111,6 @@ const Education = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Education
+export default Education;
