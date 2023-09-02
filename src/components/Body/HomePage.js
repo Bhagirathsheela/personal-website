@@ -9,6 +9,7 @@ const HomePage = () => {
       <div className="banner-col-wrapper">
         <div className="banner-colms banner-right">
           <span className="name-text">Bhagirath Sheela</span>
+          <span className="name-intro">Engineer | Traveller | Photography</span>
         </div>
       </div>
     </div>
