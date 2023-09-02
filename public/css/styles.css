@@ -98,7 +98,7 @@ body {
 
 .navbar-toggle-btn {
     position: absolute;
-    top: 10px;
+    top: 20px;
     right: 20px;
     cursor: pointer;
     color: rgba(255, 255, 255, 0.8);
@@ -976,6 +976,7 @@ body {
             font-size: 15px;
             text-indent: 0;
         }
+           .navbar{background-color: #000;}
 }
 
 @media screen and (min-width: 768px) and (max-width: 1023px) {
