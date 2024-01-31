@@ -6,9 +6,10 @@ const index = () => {
       <div className="footer_content">
         <h3 className="title_text">Bhagirath Sheela</h3>
         <p className="content_text">
-          Hi, I'm Bhagirath Sheela, a front-end developer with a passion for web and native app development. I have 5 years of experience in web development, and I
-          specialize in HTML, CSS, JavaScript and ReactJS. Below is my contact details please get in
-          touch in case of any query
+          Hi, I'm Bhagirath Sheela, a front-end developer with a passion for web
+          and native app development. I have 5 years of experience in web
+          development, and I specialize in HTML, CSS, JavaScript and ReactJS.
+          Below is my contact details please get in touch in case of any query
         </p>
         <p className="content_text">
           <span className="text_strong">Email : </span>
@@ -52,7 +53,7 @@ const index = () => {
           <li>
             <a
               className="btn_social youtube_btn"
-              href="https://youtube.com/@trekkit5443"
+              href="https://www.youtube.com/@trekkit5911"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
