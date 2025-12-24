@@ -41,9 +41,7 @@ const Header = () => {
           </svg>
         </i>
       </span>
-
-      <a href="#" className="logo"></a>
-
+     <Link to="/" className="logo"></Link>
       <ul className={`main-nav ${show ? "active-bar" : ""}`}>
         <li>
           <a
