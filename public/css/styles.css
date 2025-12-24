@@ -127,12 +127,7 @@ body {
     padding-bottom: 20px;
 }
 
-/* .accordion,
-.accordion *, .education_row,.education_row * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-} */
+
 
 .education_rows_wrap,
 .work_exp_rows_wrap {
@@ -509,24 +504,115 @@ body {
 
 }
 
-.footer_bottom .copy_right_text {
+.footer_bottom .copy_right_text, .privacy_policy_text {
     float: left;
     font-size: 14px;
     word-spacing: 2px;
     text-transform: capitalize;
 }
+.privacy_policy_text{float: right;}
 
 .footer_bottom p a {
     color: #44bae8;
     font-size: 16px;
     text-decoration: none;
 }
+.blog-container {
+  min-height: 100vh;
+  padding: 70px 20px;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: #e5e7eb;
+}
 
-/* custom arbitrary css start */
-.banner {
-    background: #000 url(../images/background.jpg);
-    overflow-x: hidden;
-    overflow-y: hidden;
+.blog-container h2 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 40px;
+  color: #38bdf8;
+  letter-spacing: 1px;
+}
+
+.blog-card {
+  max-width: 900px;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: transform .3s ease, box-shadow .3s ease, border .3s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  border: 1px solid #38bdf8;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.blog-card h3 {
+  color: #facc15;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.blog-card p {
+  color: #e5e5e5;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.read-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  color: #020617;
+  background: #38bdf8;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: .3s;
+}
+
+.read-btn:hover {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.single-blog-container {
+  min-height: 100vh;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #020617, #0b1220);
+  display: flex;
+  justify-content: center;
+}
+
+.single-blog-box {
+  max-width: 900px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 35px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #e5e7eb;
+  box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+}
+
+.single-blog-box h1 {
+  color: #facc15;
+  margin-bottom: 20px;
+  font-size: 30px;
+  letter-spacing: .5px;
+}
+
+.blog-content {
+  white-space: pre-wrap;   /* keeps formatting */
+  line-height: 1.6;
+  color: #e5e5e5;
+  font-size: 16px;
+}
+
+.blog-not-found {
+  color: #ff6b6b;
+  text-align: center;
+  margin-top: 80px;
 }
 .banner_new{
     /* background: url(../images//homepage_pic.jpg)no-repeat center; */
@@ -549,368 +635,115 @@ body {
     flex-direction: column;
     text-align: center;
 }
-
-.flg-img {
-    /* background: url(../images/banner5.png)no-repeat 0 0; */
-    background: url(../images/giphy.gif)no-repeat 0 0;
-    width: 300px;
-    display: inline-block;
-    background-size: contain;
-    min-height: 200px;
-    opacity: 0.6;
+.single-blog-container {
+  min-height: 100vh;
+  padding: 120px 20px 60px; /* <-- Added big top padding */
+  background: linear-gradient(135deg, #020617, #0b1220);
+  display: flex;
+  justify-content: center;
 }
 
-
-@keyframes spinsun {
-    0% {
-        transform: rotate(0);
-    }
-
-    100% {
-        transform: rotate(-360deg);
-    }
+/* Blog Post Page Background + Spacing (fix header overlap) */
+.blog-post-page {
+  min-height: 100vh;
+  padding-top: 120px;
+  background: linear-gradient(135deg, #020617, #0b1220);
+  display: flex;
+  justify-content: center;
 }
 
-@keyframes shadow {
-    0% {
-        background-position: 130% 0%;
-    }
-
-    33% {
-        background-position: 50% 0%;
-    }
-
-    55% {
-        background-position: 0% 0%;
-    }
-
-    80% {
-        background-position: -50% 0%;
-    }
-
-    100% {
-        background-position: -50% 0%;
-    }
+/* Centered Content Card */
+.blog-post-container {
+  max-width: 900px;
+  width: 100%;
+  padding: 20px 30px;
+  color: #e5e7eb;
 }
 
-@keyframes orbitmercury {
-    0% {
-        z-index: 2;
-        transform: rotateY(0);
-    }
-
-    49% {
-        z-index: 2;
-    }
-
-    50% {
-        z-index: -2;
-    }
-
-    99% {
-        z-index: -2;
-    }
-
-    100% {
-        z-index: 2;
-        transform: rotateY(360deg);
-    }
+/* Back Button */
+.blog-back-btn {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #38bdf8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-@keyframes orbitvenus {
-    0% {
-        z-index: 3;
-        transform: rotateY(0);
-    }
-
-    49% {
-        z-index: 3;
-    }
-
-    50% {
-        z-index: -3;
-    }
-
-    99% {
-        z-index: -3;
-    }
-
-    100% {
-        z-index: 3;
-        transform: rotateY(360deg);
-    }
+.blog-back-btn:hover {
+  text-decoration: underline;
+  color: #7dd3fc;
 }
 
-@keyframes orbitearth {
-    0% {
-        z-index: 4;
-        transform: rotateY(0);
-    }
-
-    49% {
-        z-index: 4;
-    }
-
-    50% {
-        z-index: -4;
-    }
-
-    99% {
-        z-index: -4;
-    }
-
-    100% {
-        z-index: 4;
-        transform: rotateY(360deg);
-    }
+/* Blog Title */
+.blog-post-title {
+  color: #f9fafb;
+  margin-bottom: 15px;
+  font-size: 32px;
+  font-weight: 700;
 }
 
-@keyframes orbitmars {
-    0% {
-        z-index: 5;
-        transform: rotateY(0);
-    }
-
-    49% {
-        z-index: 5;
-    }
-
-    50% {
-        z-index: -5;
-    }
-
-    99% {
-        z-index: -5;
-    }
-
-    100% {
-        z-index: 5;
-        transform: rotateY(360deg);
-    }
+/* Blog Content Text */
+.blog-post-content {
+  color: #cbd5f5;
+  line-height: 1.8;
+  font-size: 17px;
+  white-space: pre-line;
 }
 
-@keyframes orbitjupiter {
-    0% {
-        z-index: 6;
-        transform: rotateY(270);
-    }
-
-    49% {
-        z-index: 6;
-    }
-
-    50% {
-        z-index: -6;
-    }
-
-    99% {
-        z-index: -6;
-    }
-
-    100% {
-        z-index: 6;
-        transform: rotateY(360deg);
-    }
+/* Optional: Images in posts */
+.blog-post-container img {
+  width: 100%;
+  border-radius: 8px;
+  margin: 20px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.privacy-wrapper {
+  max-width: 900px;
+    margin: 0px auto 60px auto;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    padding: 70px 30px
 }
 
-@keyframes orbitsaturn {
-    0% {
-        z-index: 7;
-        transform: rotateY(270);
-    }
-
-    49% {
-        z-index: 7;
-    }
-
-    50% {
-        z-index: -7;
-    }
-
-    99% {
-        z-index: -7;
-    }
-
-    100% {
-        z-index: 7;
-        transform: rotateY(360deg);
-    }
+.privacy-wrapper h1 {
+  font-size: 38px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  color: #222;
+  letter-spacing: .5px;
 }
 
-@keyframes anti-spin {
-    from {
-        transform: rotateY(0);
-    }
-
-    to {
-        transform: rotateY(-360deg);
-    }
+.privacy-wrapper p {
+  color: #555;
+  font-size: 17px;
+  line-height: 1.85;
+  margin-bottom: 22px;
 }
 
-@keyframes anti-spin-rings {
-    from {
-        transform: rotateY(0) rotateX(73deg);
-    }
-
-    to {
-        transform: rotateY(-360deg) rotateX(73deg);
-    }
+.privacy-section {
+  margin-top: 35px;
 }
 
-
-.wrapper {
-    position: relative;
-    margin: 0 auto;
-    display: block;
-    margin-top: 200px;
-    perspective: 1000px;
-    perspective-origin: 60% 50%;
-    transform: rotate(-10deg);
-
+.privacy-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 10px;
 }
 
-.wrapper>div {
-    position: relative;
-    margin: 0 auto;
-    transform-style: preserve-3d;
-    height: 0px;
+.privacy-section p {
+  color: #444;
 }
 
-.sun {
-    width: 250px;
-    position: absolute;
-    top: 0px;
-    z-index: 1;
-    height: 125px !important;
+@media(max-width: 768px){
+  .privacy-wrapper h1{
+    font-size: 30px;
+  }
 }
 
-.sun .star {
-    width: 250px;
-    height: 250px;
-    background: url(../images/sun.png) no-repeat;
-    background-size: cover;
-    border-radius: 250px;
-    margin: 0 auto;
-    animation: spinsun 40s infinite linear;
-}
-
-.planet {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    animation-iteration-count: infinite;
-    overflow: hidden;
-}
-
-.shadow {
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    background: transparent url(../images/shadow.png) 0% 0% no-repeat;
-    background-size: cover;
-    border-radius: 100%;
-}
-
-.mercury {
-    position: absolute;
-    width: 400px;
-    z-index: 2;
-    animation: orbitmercury 12s infinite linear;
-    top: -7.5px;
-    /*half of planets height to keep orbits in line*/
-}
-
-.mercury .planet {
-    width: 15px;
-    height: 15px;
-    background-image: url(../images/mercury.png);
-    animation: anti-spin 12s infinite linear;
-}
-
-.mercury .shadow {
-    animation: shadow 12s infinite linear;
-}
-
-.venus {
-    position: absolute;
-    width: 506px;
-    z-index: 3;
-    animation: orbitvenus 15s infinite linear;
-    top: -19px;
-}
-
-.venus .planet {
-    width: 38px;
-    height: 38px;
-    background-image: url(../images/venus.png);
-    animation: anti-spin 15s infinite linear;
-}
-
-.venus .shadow {
-    animation: shadow 15s infinite linear;
-}
-
-.earth {
-    position: absolute;
-    width: 610px;
-    z-index: 4;
-    animation: orbitearth 20s infinite linear;
-    top: -20px;
-}
-
-.earth .planet {
-    width: 40px;
-    height: 40px;
-    background-image: url(../images/earth.png);
-    animation: anti-spin 20s infinite linear;
-}
-
-.earth .shadow {
-    animation: shadow 20s infinite linear;
-}
-
-.mars {
-    position: absolute;
-    width: 706px;
-    z-index: 5;
-    animation: orbitmars 30s infinite linear;
-    top: -11px;
-}
-
-.mars .planet {
-    width: 22px;
-    height: 22px;
-    background-image: url(../images/mars.png);
-    animation: anti-spin 30s infinite linear;
-}
-
-.mars .shadow {
-    animation: shadow 30s infinite linear;
-}
-
-.jupiter {
-    position: absolute;
-    width: 1100px;
-    z-index: 6;
-    animation: orbitjupiter 50s infinite linear;
-    top: -64px;
-}
-
-.jupiter .planet {
-    width: 128px;
-    height: 128px;
-    background-image: url(../images/jupiter.png);
-    animation: anti-spin 50s infinite linear;
-}
-
-.jupiter .shadow {
-    animation: shadow 50s infinite linear;
-}
-
-/* custom arbitrary css end */
-
+/* media query starts */
 @media screen and (min-width: 768px) {
     .navbar {
         display: flex;

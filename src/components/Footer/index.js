@@ -87,6 +87,9 @@ const index = () => {
           copyright © <a href="#">2023 Bhagirath Sheela. </a>
           <span>All rights reserved</span>
         </p>
+        <p className="privacy_policy_text">
+          <a href="/privacy-policy">Privacy Policy</a>
+        </p>
       </div>
     </footer>
   );

@@ -16,7 +16,7 @@ const Education = () => {
     } else {
       setShowList({ ...showList, highSchool: !showList.highSchool });
     }
-    console.log(showList, "show list");
+    //console.log(showList, "show list");
   }
   return (
     <div className="career_container">

@@ -1,17 +1,29 @@
 import React, { useState } from "react";
 import { scrollIntoViews } from "../../consts";
-
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Header = () => {
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goHomeAndScroll = (selector) => {
+    // If not already on home, go to home first
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => scrollIntoViews(selector), 200);
+    } else {
+      scrollIntoViews(selector);
+    }
+    setShow(false);
+  };
+
   return (
     <nav className="navbar">
       <span className="navbar-toggle-btn">
         <i
           className="three_bars"
-          onClick={() => {
-            setShow(!show);
-          }}
+          onClick={() => setShow(!show)}
         >
           <svg
             className="svg-inline--fa fa-bars fa-w-14"
@@ -21,7 +33,6 @@ const Header = () => {
             role="img"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
-            data-fa-i2svg=""
           >
             <path
               fill="currentColor"
@@ -30,7 +41,9 @@ const Header = () => {
           </svg>
         </i>
       </span>
+
       <a href="#" className="logo"></a>
+
       <ul className={`main-nav ${show ? "active-bar" : ""}`}>
         <li>
           <a
@@ -38,41 +51,47 @@ const Header = () => {
             className="nav-links"
             onClick={(e) => {
               e.preventDefault();
-              scrollIntoViews(".home");
-              setShow(!show);
+              goHomeAndScroll(".home");
             }}
           >
             Home
           </a>
         </li>
+
         <li>
           <a
             href="#"
             className="nav-links"
             onClick={(e) => {
               e.preventDefault();
-              scrollIntoViews(".skills");
-              setShow(!show);
+              goHomeAndScroll(".skills");
             }}
           >
             Projects
           </a>
         </li>
-        <li
-          onClick={(e) => {
-            e.preventDefault();
-            scrollIntoViews(".custom_footer");
-            setShow(!show);
-          }}
-        >
-          <a href="#" className="nav-links">
+
+        <li>
+          <a
+            href="#"
+            className="nav-links"
+            onClick={(e) => {
+              e.preventDefault();
+              goHomeAndScroll(".custom_footer");
+            }}
+          >
             Contact
           </a>
         </li>
+
         <li>
-          <a href="https://wa.me/+919610928997" className="nav-links">
-            Ping me on WhatsApp?
-          </a>
+          <Link
+            to="/blog"
+            className="nav-links"
+            onClick={() => setShow(false)}
+          >
+            Blog
+          </Link>
         </li>
       </ul>
     </nav>
