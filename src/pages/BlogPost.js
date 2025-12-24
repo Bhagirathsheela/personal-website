@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { posts } from "../consts";
+import ReactMarkdown from "react-markdown";
+
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -25,8 +27,7 @@ const BlogPost = () => {
     </Link>
 
     <h1 className="blog-post-title">{post.title}</h1>
-    <p className="blog-post-content">{post.content}</p>
-
+    <div className="blog-post-content"><ReactMarkdown>{post.content}</ReactMarkdown></div>
   </div>
 </div>
 
