@@ -810,7 +810,8 @@ body {
             text-indent: 0;
         }
            .navbar{background-color: #000;}
-.privacy_policy_text{width: 100%;}           
+.privacy_policy_text{width: 100%;}
+.footer_bottom{padding-bottom: 50px;}           
 }
 
 @media screen and (min-width: 768px) and (max-width: 1023px) {
