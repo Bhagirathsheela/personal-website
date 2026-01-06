@@ -55,6 +55,53 @@ export const educationInfo = [
 
 export const projectsInfo = [
   {
+    language: "MERN",
+    title: "Big Win",
+    intro:
+      "Big win a platform to choose the lucky numbers and bet on it. lucky numbers are drawn every day and winners are rewarded accordingly.",
+    linkBtnTxt: "View Project",
+    link: "https://big-win-frontend.vercel.app",
+  },
+  {
+    language: "MERN",
+    title: "Skill Swap",
+    intro:
+      "Skill Swap is a platform to exchange skills with other users. Users can create profiles, list their skills, and find others to trade skills with.",
+    linkBtnTxt: "View Project",
+    link: "https://skill-swap-frontend.vercel.app",
+  },
+  {
+    language: "JavaScript",
+    title: "Custom Google Logo",
+    intro:
+      "Replace the default Google logo with your own custom text. Personalize the search page with ease",
+    linkBtnTxt: "View Project",
+    link: "https://chromewebstore.google.com/detail/custom-google-logo/bellfmkglhnmefgigmjhkdeodjaajcgh",
+  },
+  {
+    language: "JavaScript",
+    title: "Edit Websites Live",
+    intro:
+      "Edit any website live in your browser. Make temporary changes to text, images, and styles for testing or fun.",
+    linkBtnTxt: "View Project",
+    link: "https://chromewebstore.google.com/detail/edit-websites-live/dimedmhonbaennlgmfaicibgpoldefcm?authuser=0&hl=en&pli=1",
+  },
+  {
+    language: "JavaScript",
+    title: "Mock Data Generator",
+    intro:"Generate realistic mock data for testing and development. Customize fields, formats, and data types to suit your needs.",
+    linkBtnTxt: "View Project",
+    link: "https://chromewebstore.google.com/detail/mock-data-generator/dlknohkngfncgickemjlfldifojpehmb?authuser=0&hl=en",
+  },
+  {
+    language: "JavaScript",
+    title: "Dark Mode for Websites",
+    intro:
+      "Enable dark mode on any website you visit. Reduce eye strain and improve readability with a single click.",
+    linkBtnTxt: "View Project",
+    link: "https://chromewebstore.google.com/detail/dark-mode-night-theme-for/jngldlhjlgcpbohcelbjkmiaocpjdokh?authuser=0&hl=en",
+  },
+  {
     language: "ReactJS",
     title: "Balaji Consultancy",
     intro:
@@ -76,8 +123,9 @@ export const projectsInfo = [
     intro:
       "Developed a foundational tic-tac-toe game using React Native, providing a hands-on learning experience with this technology.",
     linkBtnTxt: "TicTacToe",
-    link: "https://play.google.com/store/apps/details?id=com.TicTocToe.myapp&pcampaignid=web_share",
+    link: "",
   },
+  //https://play.google.com/store/apps/details?id=com.TicTocToe.myapp&pcampaignid=web_share
   {
     language: "Android, Java",
     title: "Knowledge Stuff",

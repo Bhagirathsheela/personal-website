@@ -239,48 +239,86 @@ body {
 }
 
 /* skills start*/
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+:root {
+    --font-color: #fff;
+    --font-hover-color: rgba(255, 255, 255, 0.70);
+    --link-font-color: #44bae8;
+    --link-hover-color: #16a4db;
+    --border-color: #00000033;
+    --background-image: linear-gradient(-45deg, #166397 0%, #65faf1 100%);
+    --primary-color: #23527c;
+}
+
+.font_large { font-size: 2.5em; }
+.font_medium { font-size: 1.5em; }
+.color_primary { color: var(--primary-color); }
+.text_center { text-align: center; }
+.padding_20_0 { padding: 20px 0; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+        'Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--font-color);
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ===================== SKILLS / CARDS ===================== */
+
 .skills {
-    padding: 2em 0;
-    /*  background-image: var(--background-image); */
+    padding: 3em 0;
 }
 
 .flex_container {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    color: #000;
+    justify-content: center;
+    gap: 2.5rem;
     flex-wrap: wrap;
+    color: #000;
 }
 
+/* CARD */
 .flex_clild {
-    width: 300px;
-        min-height: 350px;
-    margin: 2em 0px;
-    border: 1px solid #000;
-    box-shadow: #3e3e3ec4 2px 2px 2px;
+    width: 320px;
+    max-width: 100%;
+    min-height: 380px;
+    padding: 1.5rem 1.2rem;
+    background: linear-gradient(145deg, #e9ffff, #dff7f7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(22, 99, 151, 0.18);
     position: relative;
-    flex: 0 0 calc(25% - 50px);
+
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
-    height: 45vmin;
+    justify-content: space-between;
+
+    transition: all 0.35s ease;
 }
 
 .flex_clild:hover {
-    box-shadow: #3e3e3ec4 10px 10px 10px;
+    transform: translateY(-10px);
+    box-shadow: 0 18px 40px rgba(22, 99, 151, 0.35);
 }
 
+/* RIBBON */
 .box_tag {
-    /*  border: 1px solid var(--link-font-color);
-    left: 50%;
-    width: auto;
-    transform: translateX(-50%);
-    background: var(--link-font-color);
-    padding: 2px 20px 5px 20px;
-    font-size: small;
-    border-radius: 5px; */
     z-index: 10;
     width: 120px;
     height: 120px;
@@ -300,15 +338,13 @@ body {
 }
 
 .box_tag:before {
-    top: 0px;
+    top: 0;
     left: 82px;
-    box-sizing: border-box;
 }
 
 .box_tag:after {
     bottom: 28px;
-    left: 0px;
-    box-sizing: border-box;
+    left: 0;
 }
 
 .box_tag:before,
@@ -319,110 +355,126 @@ body {
 
 .box_tag .box_tag_text {
     position: absolute;
-    display: block;
     width: 200px;
     background-color: #166397;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     color: #fff;
-    font-size: 13px;
-    /* font-weight: bold; */
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-    /* text-transform: uppercase; */
+    font-size: 12px;
+    letter-spacing: 0.08em;
     text-align: center;
     left: -66px;
     top: 24px;
     transform: rotate(-45deg);
-    padding: 5px 0px;
+    padding: 6px 0;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
 }
 
+/* TITLE */
 .title_txt {
-    font-size: larger;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
     text-align: center;
-    display: inline-block;
-    width: 100%;
-    margin-top: 20px
 }
 
+/* DESCRIPTION */
 .intro_txt {
-    width: auto;
-    display: block;
-    padding: 10px 21px;
-
-
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+    padding: 0 1rem;
+    color: #333;
+    flex-grow: 1;
 }
 
+/* BUTTON */
 .link_btn {
-    display: inline-block;
-    padding: 5px;
-    color: #fff;
-    letter-spacing: .10rem;
-    transition: all .3s;
-    overflow: hidden;
-    z-index: 1;
-    border-color: #166397;
-    border-width: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    margin-bottom: 15px;
     background-color: #166397;
-    width: max-content;
-    transition: transform 0.3s ease;
-    margin-bottom: 20px;
+    color: #fff;
+    font-size: 0.85rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(22, 99, 151, 0.35);
+    transition: all 0.3s ease;
 }
 
 .link_btn:hover {
-    /*  box-shadow: 2px 2px 2px #ccc;*/
-    /* transform: translateX(51%); */
     background-color: #0f517d;
-    transform: scale(1.1);
-}
-
-.right_arrow {
-    /*  position: absolute;
-    right: 6px;
-    top: 6px; */
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 22px rgba(22, 99, 151, 0.45);
 }
 
 .right_arrow_svg {
-    display: inline-block;
-    vertical-align: middle;
+    transition: transform 0.3s ease;
+}
+
+.link_btn:hover .right_arrow_svg {
+    transform: translateX(4px);
 }
 
 .link_btn.disabled {
-    border: 1px solid #999999;
     background-color: #cccccc;
     color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-.link_btn.disabled .right_arrow #SVGRepo_iconCarrier path {
-    fill: #666666;
-}
+/* ===================== RESPONSIVE (CARDS ONLY) ===================== */
 
-/* .link_btn:after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
+/* Mobile */
+@media (max-width: 767px) {
+    .flex_container {
+        gap: 1.5rem;
+    }
+
+    .flex_clild {
         width: 100%;
-        height: 100%;
-        background-color:#166397;
-        z-index: -2;
+        max-width: 420px;
+        margin: 0 auto;
     }
-.link_btn:before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0%;
-        height: 100%;
-        background-color: #0b3856;
-        transition: all .3s;
-        z-index: -1;
-    } */
 
-/* .link_btn:hover {
-        color: #fff;
+    .title_txt {
+        font-size: 1.25rem;
     }
- .link_btn:hover:before {
-     width: 100%;
- } */
+
+    .intro_txt {
+        font-size: 0.9rem;
+        padding: 0 0.5rem;
+    }
+}
+
+/* Tablet */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    .flex_clild {
+        flex: 0 0 calc(50% - 2.5rem);
+        max-width: 360px;
+    }
+}
+
+/* Small Desktop */
+@media screen and (min-width: 1024px) and (max-width: 1280px) {
+    .flex_clild {
+        flex: 0 0 calc(33.33% - 2.5rem);
+        max-width: 340px;
+    }
+}
+
+/* Large Screens */
+@media screen and (min-width: 1281px) {
+    .flex_clild {
+        flex: 0 0 320px;
+    }
+}
+
+
 /* Skills end */
 
 /* Footer styles Bhagi*/
