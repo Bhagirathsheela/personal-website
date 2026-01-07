@@ -313,8 +313,9 @@ html, body {
 }
 
 .flex_clild:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 18px 40px rgba(22, 99, 151, 0.35);
+    /* transform: translateY(-10px); */
+    /* box-shadow: 0 18px 40px rgba(22, 99, 151, 0.35); */
+    box-shadow: rgba(62, 62, 62, 0.77) 10px 10px 10px;
 }
 
 /* RIBBON */
@@ -439,6 +440,7 @@ html, body {
         width: 100%;
         max-width: 420px;
         margin: 0 auto;
+        cursor: default;
     }
 
     .title_txt {
