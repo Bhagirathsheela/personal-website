@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const index = () => {
   return (
@@ -84,15 +84,15 @@ const index = () => {
       </div>
       <div className="footer_bottom">
         <p className="copy_right_text">
-          copyright © <a href="#">2023 Bhagirath Sheela. </a>
-          <span>All rights reserved</span>
+          © {new Date().getFullYear()} <a href="/">Bhagirath Sheela</a>
         </p>
+
         <p className="privacy_policy_text">
           <a href="/privacy-policy">Privacy Policy</a>
         </p>
       </div>
     </footer>
   );
-}
+};
 
-export default index
+export default index;
