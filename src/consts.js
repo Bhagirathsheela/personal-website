@@ -589,4 +589,481 @@ The value of Supabase here is concentration of effort. In a traditional build I 
 The through-line of this project is choosing infrastructure that fits the problem instead of reaching for a default. This app's hard problems are all on the **client** — rendering PDFs well, making them zoomable and touch-friendly, keeping the reading experience seamless. Its backend needs — store files, store some metadata, serve them over an API — are completely generic. So the right architecture puts the effort where the product is special (the reader) and buys the rest off the shelf (Supabase). Knowing when *not* to build a server is as valuable a skill as knowing how to build one.
 `,
   },
+
+  {
+    slug: "darkify-universal-dark-mode-css-filter",
+    title: "Darkify: How a Two-Line CSS Filter Turns Any Website Dark",
+    excerpt:
+      "A dark-mode extension can't know a site's colors in advance. Instead of restyling thousands of unknown elements, Darkify inverts the whole page — and then un-inverts the images. Here's why that works.",
+    content: `
+Darkify is a Chrome extension that turns any website dark with one click. The hard part of "dark mode for *any* site" is that you have no idea what the site looks like. You cannot ship a stylesheet for every website on the internet. So Darkify does not try to. It uses a trick that treats the page as an image to be processed rather than a structure to be restyled.
+
+## The core idea: invert everything, then fix the media
+
+When Darkify is switched on, it injects a single \`<style>\` element that does essentially this:
+
+\`\`\`css
+html { filter: invert(1) hue-rotate(180deg); background: #121212; }
+img, video { filter: invert(1) hue-rotate(180deg); }
+\`\`\`
+
+Two rules. The first inverts the **entire page**. Inversion flips brightness: white backgrounds become near-black, black text becomes near-white. Overnight, a bright site is dark. But raw inversion also mangles color — a blue button becomes orange, a red heart becomes cyan. That is what \`hue-rotate(180deg)\` corrects: rotating the hue wheel by 180 degrees after inverting brings colors back close to where they started, so brand colors still look roughly right, just on a dark canvas.
+
+## The clever part: double inversion for images
+
+If you stopped there, every photo and video on the page would look like a photographic negative — faces in eerie inverted colors. That is unacceptable. So the second rule inverts images and videos **again**.
+
+Two inversions cancel out. \`invert(1)\` applied by the \`html\` rule, then \`invert(1) hue-rotate(180deg)\` applied to the image itself, returns the image to (very nearly) its original appearance. The net effect: the *chrome* of the page goes dark, but photos, videos, and other media stay looking normal. This is the whole reason the approach is usable rather than a novelty — it darkens the interface without ruining the content.
+
+## Why solve it at the filter layer
+
+The instinct of most developers is to walk the DOM and restyle elements: find every element with a light background, override it; find every dark text node, lighten it. That approach is enormous, brittle, and slow — it breaks the moment a site uses a color you did not anticipate, and it has to re-run every time the page changes.
+
+The CSS-filter approach sidesteps all of that. It does not care what the page contains. It applies one transformation to the rendered output, the same way an image editor applies a filter to a photo. One rule covers every element that will ever exist on any site. This is a good lesson in general: sometimes the right place to solve a problem is a layer down from where it appears. The problem *looks* like "restyle thousands of elements"; it is actually "apply one transform to the final image."
+
+## The state, and the toggle
+
+The on/off preference lives in \`chrome.storage\`, so the choice persists between visits and across tabs. Flipping the toggle adds or removes that single style element — enabling dark mode is injecting the rule, disabling it is deleting it. There is no cleanup of scattered overrides because there were never any scattered overrides to begin with.
+
+## The honest trade-offs
+
+This technique is not perfect, and it is worth knowing where it strains:
+
+- **Nested media and backgrounds** — an element that is both a container and shows an image can occasionally need a second look, because "what counts as media to un-invert" is a judgment call.
+- **Sites with their own dark mode** — inverting an already-dark site makes it light, the opposite of what you want. A universal inverter has no way to know a site is already dark without inspecting it.
+- **Fixed overlays and shadows** — very heavy visual effects can look slightly off after a global invert.
+
+But for the enormous majority of bright, default-light websites, two CSS rules deliver a genuinely comfortable dark mode instantly. Darkify is my favorite example of how a small, well-chosen idea beats a large, brute-force one.
+`,
+  },
+
+  {
+    slug: "how-manifest-v3-ad-blocking-works",
+    title: "How Ad Blocking Actually Works in Manifest V3: Two Engines, Two Problems",
+    excerpt:
+      "\"Ad blocker\" is one label hiding two completely different engineering problems. Building Ad Cleaner meant a declarative network filter AND a main-world script that edits YouTube's player data before YouTube reads it.",
+    content: `
+Ad Cleaner is a Chrome extension I built to block YouTube video ads, Shorts ads, and promoted thumbnails, with optional cosmetic cleaning across the rest of the web. Building it taught me that "ad blocker" is a single label stretched over **two entirely different technical problems**, each needing its own mechanism. This post is about both.
+
+## Problem one: block ad *requests* on the network
+
+Most web ads are separate network requests — a script from an ad server, a tracking pixel, an iframe of creative. The clean way to stop those is to never let them load.
+
+In Manifest V3, that job belongs to **declarativeNetRequest**. Instead of an extension inspecting your traffic in JavaScript, it ships a static JSON rulebook and the browser enforces it directly. Ad Cleaner's \`rules.json\` is a list like this:
+
+\`\`\`json
+{
+  "id": 1,
+  "action": { "type": "block" },
+  "condition": {
+    "urlFilter": "||doubleclick.net^",
+    "resourceTypes": ["script", "xmlhttprequest", "image", "sub_frame", "media", "ping", "websocket"]
+  }
+}
+\`\`\`
+
+Rules like this block known ad and tracking hosts — \`doubleclick.net\`, \`googlesyndication.com\`, \`googleadservices.com\`, and so on — across the listed resource types. The key MV3 point: the extension never sees your browsing. It hands Chrome a set of rules once, and Chrome does the blocking itself. That is both **faster** (no JavaScript in the request path) and **more private** (the extension is not a middleman watching every request) than the old \`webRequest\` interception model. This privacy-and-performance shift is the main reason MV3 changed how blockers are built.
+
+## Problem two: YouTube ads are not requests, they are *data*
+
+Here is where a network filter is not enough. YouTube's video ads are not a separate resource you can block by URL — the instruction to play an ad is embedded **inside the player's own data**, delivered in the same response as the video you want to watch. Block the response and you block the video too.
+
+So on YouTube, Ad Cleaner injects a script into the page's **main world** — the same JavaScript context YouTube's own code runs in — and edits the player data *before YouTube reads it*. It hooks the points where that data arrives:
+
+1. **\`JSON.parse\`** — wrap it so any parsed player response has its ad-related fields stripped out before it is returned.
+2. **\`Response.prototype.json\`** — the same idea for fetch responses that do not pass through \`JSON.parse\`.
+3. **The \`ytInitialPlayerResponse\` setter** — catch the cold-load case where the very first player data is assigned as a global on page load.
+
+By the time YouTube's player looks for ad instructions, they are gone. The video plays; the ad never had data to render from.
+
+## The anti-adblock cat-and-mouse
+
+YouTube actively fights blockers, and one of its tactics is a **honeypot**: serve decoy data shaped to look like the real player response, so a naive blocker that mangles *everything* corrupts playback and reveals itself. Ad Cleaner guards against this by **shape-checking** what it modifies — it only strips fields from objects that genuinely look like a player response, and it skips \`data:\` and \`blob:\` URLs that are the classic honeypot channel. Being surgical, not indiscriminate, is what keeps the video working while the ads do not.
+
+## Why the split matters
+
+The takeaway generalizes well beyond ad blocking. When one user-facing feature quietly contains two different problems — here, "requests on the wire" versus "data inside the app" — trying to solve both with one tool produces something that half-works. Ad Cleaner uses **declarative rules** for the network layer, where the browser is the right enforcer, and **careful main-world interception** for the application layer, where the ad lives inside the data. Recognizing that a single label hid two problems was the entire design.
+`,
+  },
+
+  {
+    slug: "content-script-vs-changing-dom-custom-google-logo",
+    title: "A Content Script vs. a Page That Fights Back: Lessons From Custom Google Logo",
+    excerpt:
+      "Replacing the Google logo sounds trivial until the page rewrites itself, comes in a dozen regional flavors, and your own fix triggers an infinite loop. A debugging story about content scripts.",
+    content: `
+Custom Google Logo is a Chrome extension that replaces the Google homepage logo with your own text or image. It sounds like a five-minute project — find the logo, swap it. In reality it is a small masterclass in the hard parts of writing **content scripts** against a page that is actively working against you. Three problems made it interesting.
+
+## Problem 1: the page rewrites itself
+
+Google's homepage is a single-page app. Navigate to search results and back, and Google re-renders the homepage, throwing away whatever the extension injected. A one-time "replace on load" swap flickers back to the real logo the moment the user interacts with the page.
+
+The fix is a **MutationObserver** — a browser API that watches the DOM for changes and runs a callback when they happen. Custom Google Logo targets \`#lga\` (the stable logo container Google has used for years), replaces its contents with the custom logo, and then keeps an observer attached. If Google re-renders and the logo comes back, the observer fires and re-applies the custom one automatically. The mental shift here is important: with a modern web app you cannot treat the DOM as something you edit once. You edit it, then you *defend* your edit.
+
+## Problem 2: my own fix caused an infinite loop
+
+This is the bug I am proudest of finding. To size the custom text logo, an early version measured its width with SVG \`getBBox()\`. But \`getBBox()\` only returns a real measurement once the element is actually in the document — so the code inserted the SVG into \`document.body\` to measure it.
+
+That insertion was itself a DOM mutation. The MutationObserver watching the page saw it, fired, re-ran the inject function, which measured again, which inserted again, which fired the observer again… an **infinite loop** that pegged the CPU.
+
+The fix was to measure text **without touching the DOM** at all, using the canvas \`measureText()\` API, which computes text width off-screen with no insertion and therefore no mutation. The lesson burned itself in: when you both **observe** and **modify** the DOM, every modification you make is a change your own observer will react to. You have to make sure your writes cannot feed back into your watcher — either by measuring without mutating, or by pausing the observer around your own edits.
+
+## Problem 3: Google is not one website
+
+Google runs on dozens of regional domains — \`google.com\`, \`google.co.in\`, \`google.co.uk\`, \`google.de\`, \`google.com.br\`, and many more. A user in India expects the extension to work on \`google.co.in\`, not just \`.com\`. So the manifest declares host permissions and content-script matches for each regional domain, and the extension only acts on the homepage paths (\`/\` and \`/webhp\`) so it never interferes with search results. There is no clever trick here — just the discipline of remembering that "Google" is a family of sites, and a browser extension has to enumerate them explicitly.
+
+## The finishing touches
+
+On top of the core swap, the extension adds things that make it feel finished: colored palettes for the text logo (classic Google colors, monochrome, and themed sets), an override of the new-tab page, an optional rewrite of the browser tab title, and a keyboard shortcut (\`Ctrl+Shift+L\`) to toggle the effect. Settings persist through \`chrome.storage\`.
+
+## What it taught me
+
+A content script lives in someone else's house. The page can re-render at any moment, exists in many regional variants, and — as the \`getBBox\` loop proved — will happily turn your own good intentions into a runaway loop. Writing robust content scripts is less about the swap itself and more about coexisting with a document that does not know you are there and would rewrite you if it did.
+`,
+  },
+
+  {
+    slug: "edit-any-website-live-designmode-injected-runtime",
+    title: "Edit Any Website Live: The Browser's Hidden Editor and an Idempotent Injected Runtime",
+    excerpt:
+      "The browser already ships a full in-place text editor — designMode. The interesting engineering is wrapping it in a runtime you can inject repeatedly without breaking anything.",
+    content: `
+Edit Any Website Live is a Chrome extension that lets you edit the text of any web page in place — change a headline, fix a price, tweak a paragraph — right in the browser, then save or copy the modified HTML. It is genuinely useful for mockups, screenshots, and demos. And most of its "hard part" is a capability the browser has shipped for years that almost nobody uses directly.
+
+## designMode: the editor that was already there
+
+Browsers have a built-in editing mode. Setting a document into **design mode** (the same machinery behind \`contentEditable\`) makes the entire page's text editable — click into any heading or paragraph and type, like a word processor. The browser handles cursor placement, selection, and text input for you.
+
+So the core feature is not "build a rich text editor." It is "flip the switch the browser already has, and build a good workflow around it." The extension toggles editing on the current tab via a popup button and a \`Ctrl+Shift+E\` shortcut. That reframing — recognizing the platform already contains the expensive part — is the whole reason a one-person project can ship a credible live-editing tool.
+
+## The real engineering: an injectable runtime that is safe to re-inject
+
+The subtler problem is *how* the extension's code lives on the page. Edit Any Website Live injects a runtime that exposes a small API on \`window.__ewl\` — functions like \`apply\`, \`savePage\`, \`copyHTML\`, \`getHTML\`, and \`undoAll\`. But an extension might inject that runtime more than once: the user clicks the button twice, or navigates, or a newer version of the extension runs on an already-injected page.
+
+If injection were naive, re-injecting would stack duplicate event handlers, double-install styles, and generally corrupt the page. So the runtime is built to be **idempotent**. It carries a version, and on load it checks: if the same version of \`window.__ewl\` is already present, it does nothing; if an older version is there, it cleanly overwrites the handlers rather than piling new ones on top. Re-running the script is always safe. This is a pattern worth internalizing for any injected script — assume you will be injected again, and make the second injection a no-op or a clean replacement, never an accumulation.
+
+## Undo, save, and copy
+
+On top of editing, the extension gives the workflow teeth:
+
+- **Undo** — \`undoAll\` reverts the changes, so experimenting is consequence-free.
+- **Save / copy HTML** — \`savePage\`, \`getHTML\`, and \`copyHTML\` let you extract the edited markup, so a live tweak becomes something you can keep or hand to someone.
+- **A floating badge** — a small on-page indicator (with its own injected styles and a very high \`z-index\` so no site can cover it) tells you edit mode is active, animated in so it is obvious.
+
+These turn "the page is temporarily editable" into "I made a change, checked it, and saved the result."
+
+## Why this project is a good teacher
+
+Edit Any Website Live is two lessons in one. First: know your platform. The browser is far more capable than most extensions use — design mode is a full editor hiding behind a single property. Second: injected code has a lifecycle you do not fully control, so write it to tolerate being run again. An idempotent, versioned runtime on \`window.__ewl\` is what separates a tool that works once from a tool that works every time, on every page, no matter how many times the user pokes it.
+`,
+  },
+
+  {
+    slug: "swift-chat-connect-realtime-ephemeral-chat-postgres-drizzle",
+    title: "Swift Chat Connect: Proximity-Based Ephemeral Chat on WebSockets, Drizzle and Postgres",
+    excerpt:
+      "A location-aware chat where messages are meant to disappear. Building it meant WebSockets for live delivery, sessions for auth, and a typed Postgres schema through Drizzle ORM — a very different stack from my MERN chats.",
+    content: `
+Swift Chat Connect is a real-time, location-aware chat app: users discover people nearby, swipe to connect, and exchange **ephemeral messages** meant to disappear rather than live forever. I built it on a deliberately different stack from my MongoDB-based projects — TypeScript end to end, **PostgreSQL** through **Drizzle ORM**, WebSockets for delivery, and React on the front. This post is about the pieces that make a live, disposable chat work.
+
+## A typed schema as the source of truth
+
+With Drizzle, the database schema is TypeScript. The tables read almost like documentation:
+
+\`\`\`ts
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull(),
+  latitude: real("latitude").default(0),
+  longitude: real("longitude").default(0),
+  isAnonymous: boolean("is_anonymous").default(false),
+  lastActive: timestamp("last_active").defaultNow(),
+});
+
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull(),
+  receiverId: integer("receiver_id").notNull(),
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+\`\`\`
+
+There are also \`swipes\` (a row per right/left action between two users). The payoff of defining tables this way is that Drizzle **infers the TypeScript types** from the schema, and \`drizzle-zod\` generates matching validation schemas. One definition gives me the database structure, the compile-time types, and the runtime validators — they cannot drift apart because they all come from the same source. Compared to hand-writing types that mirror a database, this eliminates a whole category of "the code and the table disagree" bugs.
+
+## Why WebSockets, not request/response
+
+Chat is the canonical case where plain HTTP is the wrong shape. HTTP is a client asking and a server answering; chat needs the **server** to push a message to a recipient the instant it arrives, with no request to answer. So Swift Chat Connect runs a WebSocket server (via the \`ws\` library) alongside Express. A message sent by one user is written and then pushed over the live socket to the other, who sees it appear without polling or refreshing. The HTTP side still handles the ordinary things — logging in, loading profiles — while the socket handles the real-time flow.
+
+## Sessions for auth, with a pruning store
+
+Authentication uses **express-session**: on login the server stores the user's id in a session, and a \`requireAuth\` middleware rejects any request whose session has no user. In development the session store is an in-memory store (\`memorystore\`) configured to **prune expired entries every 24 hours**, so stale sessions do not accumulate. Cookies are marked secure in production. It is a pragmatic auth setup — simple to reason about, with the session as the single thing that says "this request is really you."
+
+## "Ephemeral" is a design stance, not a feature you bolt on
+
+The interesting product decision is that messages are meant to be **temporary** — the schema and app treat chat as disposable, cleared rather than archived. Designing for ephemerality changes how you think: you are not building a permanent record you must protect forever, you are building a live conversation that is expected to vanish. That informs storage, retention, and even the emotional tone of the product. It is the opposite of most chat apps, and building it made me appreciate that *deletion* can be a first-class feature rather than an afterthought.
+
+## The contrast that taught me the most
+
+My SkillSwap chat runs on MongoDB and Socket.IO; Swift Chat Connect runs on Postgres, Drizzle, and raw \`ws\`. Building both showed me the trade-offs directly: the SQL-and-Drizzle path gives you a rigid, typed schema and relational guarantees that catch mistakes at compile time, at the cost of defining structure up front. For a chat with clear relations — users, swipes, messages between them — that structure was a good fit, and having the types flow from the schema made the whole app safer to change.
+`,
+  },
+
+  {
+    slug: "what-machine-coding-react-interview-projects-teach",
+    title: "What Building 'Interview' React Apps Actually Teaches You",
+    excerpt:
+      "Machine-coding rounds ask for a users page with search, a service layer, and an editable table. Small on the surface — but they drill the patterns that real React apps are made of.",
+    content: `
+react-interview-projects is a small React + Vite app I built to practice the kind of tasks that come up in front-end machine-coding rounds: build a searchable list, wire it to an API, make a table you can edit inline. They look trivial next to a full product, but they concentrate the exact patterns you reach for constantly in real work. Here is what these deceptively small builds drill.
+
+## A service layer, even for one endpoint
+
+The project keeps API calls in a \`userService\` (using \`axios\`) rather than scattering \`fetch\` calls inside components. That separation seems like overkill for a demo, but it is the single habit that most improves a React codebase. Components should render; a service should know *how* to talk to the backend. When the endpoint changes, or you add caching, or you need to mock the API in a test, there is exactly one place to touch. Practicing this on a toy project makes it automatic on a real one.
+
+## Search that does not hammer the server
+
+A \`SearchBar\` filtering a \`UserList\` is the classic exercise, and the classic mistake is firing a request on every keystroke. The pattern the exercise teaches is **debouncing** — waiting until the user pauses typing before searching — or filtering an already-loaded list in memory when the dataset is small. Deciding *which* is right is the actual skill: client-side filtering for a small fixed list, debounced server queries for a large one. That judgment is what interviewers are really probing, and it comes up in every search box you will ever build.
+
+## Component decomposition
+
+The users feature is split into a \`UsersPage\`, a \`UserList\`, and a \`UserCard\`. Breaking a screen into a page (data and state), a list (iteration and layout), and a card (presentation of one item) is the bread-and-butter of React structure. Get the boundaries right and props flow cleanly downward; get them wrong and you end up with one giant component holding everything. Doing this repeatedly on small tasks builds the instinct for where the seams belong.
+
+## Editable tables: local state meets "save"
+
+The \`EditableTable\` page is the trickiest of the set, because inline editing forces you to think about **state ownership**. While a user is typing in a cell, where does that value live? Usually in local component state, kept separate from the "saved" data, so an edit can be committed or cancelled. This tension — draft state versus persisted state — is at the heart of every form, every settings page, every editable anything. An editable table is a compact way to practice it.
+
+## Routing as structure
+
+With \`react-router-dom\`, the app splits into a \`/users\` route and a \`/tables\` route behind a shared nav using \`NavLink\` (which knows which link is active). Routing is not just navigation — it is how you decompose an app into independent, bookmarkable, lazy-loadable screens. Even a two-route demo reinforces thinking of features as routes rather than a monolith.
+
+## Why "small" practice is not small
+
+It is tempting to dismiss machine-coding drills as artificial. They are not. Strip any large React application down and it is made of these exact atoms: a service layer, a debounced search, well-decomposed components, draft-versus-saved state, and route-based structure. Practicing them in isolation — where nothing else distracts — is how the patterns become reflexes. When I build something real like SkillSwap or a dashboard, I am not inventing these approaches under pressure; I am reusing muscle memory built on projects exactly like this one.
+`,
+  },
+
+  {
+    slug: "building-react-sites-for-clients-and-causes",
+    title: "Building React Sites for Real Clients and Real Causes",
+    excerpt:
+      "A consultancy that needed customers to find them, and a COVID-era effort to get face shields to frontline workers. Side projects are fun, but building for someone else's actual need is a different discipline.",
+    content: `
+Most of my projects start from curiosity. Two did not: **Balaji Consultancy**, a live website for a consultancy service business in Hisar, Haryana, and **Indore Cares**, a site built during COVID-19 to help frontline workers request face shields. Building for a real client and a real cause is a different discipline from building for yourself, and these two taught me things a personal side project never could.
+
+## Balaji Consultancy: the site is a business tool, not a portfolio piece
+
+For a consultancy, a website exists to do one job — help potential customers find the business, understand what it offers, and get in touch. That reframes every decision. Nobody visiting cares which framework I used or how clever the code is. They care whether the services are clear and whether they can reach the business.
+
+So the priorities were different from a hobby build: clarity of information over visual flourish, a structure that maps to how a customer thinks ("what do they do, can they help me, how do I contact them"), and reliability, because a business site that is down is a business losing leads. React gave me a clean, componentized way to build and launch it, but the engineering was in service of the business goal, not the other way around. The discipline I took away: when you build for a client, success is measured by *their* outcome — enquiries, calls, customers — not by your technical satisfaction.
+
+## Indore Cares: constraints and urgency for a cause
+
+Indore Cares came out of the pandemic. Frontline workers needed face shields as protection against exposure, and the site's job was to let them request those shields — connecting a need to the people who could fill it. Building something people rely on during a crisis sharpens your sense of what matters.
+
+Here the pressure was different again. It had to be **simple enough that a stressed, non-technical frontline worker could use it** without a manual. It had to work on whatever phone someone happened to have. And it had to be built quickly, because the need was immediate. That environment strips away gold-plating fast — there is no time to polish an animation when the point is to get protective equipment to someone who needs it today. The lesson was about ruthless prioritization: figure out the one action the user must complete, make that path effortless, and let everything else wait.
+
+## What client and cause work share
+
+Both projects taught the same underlying thing from opposite directions: **the technology is not the point**. For the consultancy, the point was leads. For Indore Cares, the point was getting face shields to people. React, hosting, components — all of it was plumbing in service of a human outcome.
+
+That is a genuinely different mindset from a curiosity project, where the outcome *is* the learning. When you build for someone else:
+
+- **You inherit their definition of done.** It is finished when it serves their need, not when the code is elegant.
+- **You design for their user, who is not you.** A frontline worker and a consultancy's prospective client have nothing in common with a developer, and the interface has to meet them where they are.
+- **Reliability outranks cleverness.** A live site people depend on cannot be a place to experiment.
+
+## Why I value these two most
+
+My extensions and apps are where I learn techniques. Balaji Consultancy and Indore Cares are where I learned that software is a means to an end that belongs to someone else. A consultancy got a working storefront on the web; frontline workers got a simple way to ask for protection when it mattered. Those outcomes, not the stacks behind them, are what make these the projects I am most glad I built.
+`,
+  },
+
+  {
+    slug: "publishing-to-the-chrome-web-store-lessons",
+    title: "Shipping to the Chrome Web Store: The Part That Isn't Code",
+    excerpt:
+      "Writing an extension is half the work. Getting it published — permission justifications, review, a listing that survives scrutiny — is the other half. Lessons from getting several extensions live.",
+    content: `
+I have several extensions live on the Chrome Web Store, and the thing nobody warns you about is that **writing the extension is only half the job**. The other half is getting it *approved and kept* on the store, which is its own skill with its own rules. This post is about that half — the part that is not code.
+
+## Least privilege is not optional
+
+The single biggest factor in a smooth review is permissions. Chrome's review process scrutinizes what an extension asks for, and every permission you request must be **justified by a visible feature**. An extension that requests broad host access "just in case" is asking for trouble.
+
+Building my extensions taught me to request the *narrowest* permission that does the job. Custom Google Logo only lists the specific Google regional domains it modifies, not \`<all_urls>\`. Ad Cleaner uses \`declarativeNetRequest\` — which lets the browser do the blocking from a static rulebook — specifically because it avoids the more invasive "read all your traffic" model. When your permissions map one-to-one to features a reviewer can see and try, review is straightforward. When they do not, you get rejected and asked to explain yourself.
+
+## Manifest V3 is the price of admission
+
+The store now requires **Manifest V3**, and MV3 removes things MV2 developers leaned on: no persistent background page (you get a service worker that the browser can kill at any time), no arbitrary remote code execution, a stricter Content Security Policy. If your extension depends on old patterns, it will not ship. All my extensions are MV3 from the start — background logic in service workers, no inline scripts, bundlers configured to be CSP-safe. Getting this right up front is far easier than retrofitting it after a rejection.
+
+## The listing is part of the product
+
+A store listing is not paperwork you fill out at the end; it is what determines whether anyone installs the extension and whether the review passes. It needs an honest, specific description of what the extension does, screenshots and promo images at the required dimensions, and — crucially — a **privacy disclosure** that matches the extension's actual behavior. If your listing claims one thing and your code does another, that mismatch is exactly what review catches.
+
+I keep the description concrete and truthful: what it does, in plain language, matching the permissions requested. "Blocks YouTube video ads and promoted thumbnails" is a claim a reviewer can verify by installing it. Vague or exaggerated claims invite scrutiny.
+
+## Updates go through review too
+
+Publishing once is not the finish line. Every update is re-reviewed, and store policies change over time — an extension that was fine last year can need adjustments to stay compliant. Versioning matters (the manifest version drives updates that push to every user), and so does keeping an eye on policy changes. Shipping to the store is an ongoing relationship, not a one-time submission.
+
+## What the store taught me about building
+
+Knowing the store's rules changed how I *build*, not just how I submit. I now think about permissions while designing a feature, not after. I reach for approaches like declarative rules that are both better engineering and easier to justify. I write honest descriptions because the code has to back them up. The constraints the Chrome Web Store imposes — least privilege, MV3, truthful disclosure — are, it turns out, mostly just good software practices with a review process attached. Building to pass review made my extensions better, not just publishable.
+`,
+  },
+
+  {
+    slug: "react-native-expo-lessons-from-shipping-mobile-apps",
+    title: "React Native and Expo: Hard-Won Lessons From Shipping Real Mobile Apps",
+    excerpt:
+      "Expo makes React Native approachable until the physical world interferes — networking across devices, SDK version traps, and native modules. Notes from building KundliDost, TrustPe mobile, and more.",
+    content: `
+I have built several mobile apps with React Native and Expo — the KundliDost astrology app, the TrustPe lending app's mobile client, a TicTacToe game, and others. Expo makes getting started genuinely easy, but the moment your app has to talk to a real backend on a real device, a set of very physical problems appears that no amount of JavaScript knowledge prepares you for. These are the lessons that cost me real time.
+
+## localhost means something different on every target
+
+The first wall everyone hits: your backend runs on \`localhost:5000\`, and the app cannot reach it. Why? Because "localhost" is relative to the device the code runs on.
+
+- On the **Android emulator**, \`localhost\` is the emulator itself. To reach your development machine you use the special alias \`10.0.2.2\`, which the emulator maps back to the host.
+- On a **physical phone**, neither \`localhost\` nor \`10.0.2.2\` works — the phone must call your computer's **LAN IP** (like \`192.168.1.4\`), and both devices have to be on the same Wi-Fi.
+
+In KundliDost I put the API base in an \`EXPO_PUBLIC_API_URL\` environment variable precisely so switching between emulator and phone is a one-line change rather than a code edit. Understanding *why* the URL differs per target — rather than memorizing magic numbers — is what makes this stop being mysterious.
+
+## The QR code can point at the wrong network
+
+Expo starts a dev server and gives you a QR code to open the app in Expo Go. On a machine with several network adapters — VirtualBox, WSL, a VPN, plus real Wi-Fi — Expo sometimes bakes the *wrong* adapter's IP into that QR code. You scan it, and the app tries to reach an address that does not exist on your Wi-Fi, and nothing happens with no useful error.
+
+The fix is pinning \`REACT_NATIVE_PACKAGER_HOSTNAME\` to your actual Wi-Fi IP so the QR always encodes a reachable address. This is the kind of environmental gotcha that has nothing to do with your code and everything to do with the machine you develop on — and it will waste an afternoon if you do not know it exists.
+
+## SDK version is a compatibility contract, not a number to maximize
+
+The instinct with dependencies is to stay on the latest version. With Expo that instinct can lock users out. Expo Go — the app most people use to open your project during development — only supports specific SDK versions, because the store version of Expo Go is frozen at a particular point. KundliDost is deliberately pinned to **Expo SDK 54** for exactly this reason: chasing a newer SDK would mean testers literally could not open the app in Expo Go. With React Native, the version is a compatibility contract between your code, Expo Go, and the native runtime — not a bragging point.
+
+## Native modules are where "managed" ends
+
+Expo's managed workflow is wonderful until you need a native SDK it does not bundle — Google Sign-In, a payment provider, and the like. At that point Expo Go is not enough; you need a custom **dev client** or a cloud build (Expo's EAS). This is a planned transition, not a surprise, but it defines the ceiling of the easy path. Knowing where that ceiling is lets you architect for it — keep the JavaScript app clean and defer the native-module work until you genuinely need those SDKs, then move to EAS builds for it.
+
+## The meta-lesson
+
+React Native's cross-platform promise is real, and Expo makes the on-ramp gentle. But mobile development drags you back into the physical world in a way web development rarely does: which network an IP belongs to, which SDK a store app supports, which capabilities need native code. None of these are hard once you know them, and none are discoverable by reading about React. Shipping actual apps — and losing time to each of these at least once — is the only way I learned them. Now they are a checklist instead of a mystery.
+`,
+  },
+
+  {
+    slug: "mongodb-vs-postgres-across-my-projects",
+    title: "MongoDB or Postgres? What I Actually Reach For, and Why",
+    excerpt:
+      "I've shipped projects on both. The choice isn't about which database is 'better' — it's about whether your data has a fixed shape and real relationships. Here's the decision as I actually make it.",
+    content: `
+Across my projects I have used both MongoDB and PostgreSQL, and the question I get asked most is which one is "better." That framing is wrong. Having built real apps on each, I have a concrete decision rule, and it comes down to one question: **does your data have a fixed shape and real relationships, or not?**
+
+## Where I reach for MongoDB
+
+Several of my projects use MongoDB with Mongoose: SkillSwap, Big Win, KundliDost, TrustPe. What they share is either a fast-moving, evolving data shape or documents that are naturally self-contained.
+
+MongoDB stores documents — flexible, JSON-like records — and does not force you to define a rigid schema up front (Mongoose adds an optional schema layer on top when you want structure). That flexibility is a genuine advantage when a project is young and the model is still changing, or when a record is a natural whole you fetch together. In KundliDost, a computed chart is a self-contained document; in early-stage building, not having to write and run a migration every time a field changes keeps iteration fast. When you are still discovering what your data looks like, MongoDB lets the schema follow the code instead of the code waiting on the schema.
+
+## Where I reach for Postgres
+
+Swift Chat Connect uses PostgreSQL through Drizzle ORM; the Pharmacy College app uses Supabase, which is Postgres underneath. I chose SQL for these because the data has **clear structure and relationships** that I *want* enforced.
+
+Postgres is relational: you define tables and columns with real types, and the database guarantees that structure. In Swift Chat Connect there are users, swipes, and messages between users — entities with defined relations. Making those relationships explicit in the schema means the database itself refuses to store nonsense, and with Drizzle the TypeScript types are generated *from* that schema, so the code and the database cannot disagree. When the shape is known and the relationships matter, that rigidity is not a constraint — it is a safety net.
+
+## The trade-off in one sentence
+
+MongoDB asks less of you up front and lets the model flex; Postgres asks you to define structure first and then enforces it for you. Flexibility versus guarantees. Neither is free: MongoDB's flexibility means *your application* has to be disciplined about shape, because the database will not be; Postgres's guarantees mean you pay the cost of defining and migrating a schema.
+
+## How I actually decide
+
+My practical rule after building on both:
+
+- **Reach for MongoDB when** the data model is still moving, records are naturally self-contained documents, or I want to iterate fast without migrations. Good for early-stage projects and document-shaped data.
+- **Reach for Postgres when** the data has clear entities and relationships I want enforced, when correctness of structure matters, and especially when I am using a typed layer like Drizzle that turns the schema into compile-time safety.
+
+## The thing nobody tells beginners
+
+Both databases will happily run any project. You *can* build a chat app on either; I effectively did (SkillSwap on Mongo, Swift Chat Connect on Postgres). The difference is not capability, it is **where the discipline lives** — in your application code, or in the database schema. Deciding that consciously, instead of defaulting to whichever you learned first, is the actual skill. I do not have a favorite database. I have a favorite question to ask before I pick one.
+`,
+  },
+
+  {
+    slug: "deploying-side-projects-vercel-render",
+    title: "How I Deploy Side Projects: Vercel for the Front, Render for the Back",
+    excerpt:
+      "A side project that only runs on your laptop isn't finished. Here's the split I use — static front-ends on Vercel, always-on backends on Render — and the config that makes deploys boring.",
+    content: `
+A project that only runs on your machine is a demo, not a product. Getting my side projects actually *live* — this website, Big Win, SkillSwap, KundliDost, the Pharmacy College app — settled into a repeatable split: **front-ends on Vercel, backends on Render.** Here is the reasoning and the setup that makes deploying uneventful.
+
+## Why the split exists
+
+A React front-end and a Node backend are fundamentally different things to host.
+
+A React app, once built, is **static files** — HTML, JS, CSS. It does not "run"; it is served. That is exactly what Vercel is built for: connect the repo, it builds on every push and serves the output on a global CDN. My personal website and the Pharmacy College app are static builds that Vercel hosts and redeploys automatically whenever I push.
+
+A Node/Express backend is a **long-running process** — it has to stay up, hold connections, run scheduled jobs, talk to a database. That is a server, and Render hosts exactly that: a persistent Node service with environment variables and a real runtime. Big Win's lottery backend has to stay running to fire its scheduled draws; that cannot live on static hosting.
+
+Matching each half of the app to the hosting model built for it is the whole idea. Do not try to run a persistent server on static hosting, and do not spin up a full server to hand out static files.
+
+## Configuration as code
+
+The deploys are boring — which is the goal — because the configuration lives in the repo. KundliDost and TrustPe carry a \`render.yaml\` that describes their backend service to Render: what to build, what to run, which environment it needs. The Pharmacy College app has a \`vercel.json\` that tells Vercel how to handle the build and routing (important for a single-page app, where every route must fall back to \`index.html\` so client-side routing works). Because these files are committed, the deployment is reproducible and reviewable — the hosting setup is versioned alongside the code instead of living as clicks in a dashboard someone has to remember.
+
+## Environment variables are the seam
+
+The one thing that must *not* be in the repo is secrets — database URLs, API keys, session secrets. Those live in the hosting platform's environment settings. This forces a good habit: the code reads configuration from the environment (\`process.env\`), and the same build runs locally, in staging, and in production with only the environment changing. In KundliDost the API base URL, the database connection, and the AI key are all environment-driven, which is why the app can run against an in-memory database locally and a real one in production without a code change.
+
+## The single-page-app routing gotcha
+
+The most common deploy bug for a React site is refreshing on a route like \`/blog\` and getting a 404. That happens because the server looks for a file at that path and there is not one — the route only exists inside the client-side router. The fix is telling the host to serve \`index.html\` for unknown paths so the React router can take over. On Vercel that is a rewrite rule; getting it right is the difference between an app that only works if you start at the home page and one where every URL is shareable.
+
+## Why this matters more than it seems
+
+Deployment is where a lot of side projects quietly die — they work locally, the last mile feels like a chore, and they never go live. Turning it into a **known, config-in-repo routine** removes that friction. Vercel builds my front-ends on push; Render keeps my backends running; secrets live in the environment; SPA routing is handled once. Because the setup is boring and repeatable, shipping a new project is no longer a special event — it is just \`git push\`.
+`,
+  },
+
+  {
+    slug: "one-schema-client-and-server-zod-typescript",
+    title: "One Schema for Client and Server: Schema-First TypeScript With Zod",
+    excerpt:
+      "Defining what a 'user' or a 'loan' looks like twice — once on the server, once on the client — is how they drift apart. Defining it once, with Zod, and deriving everything from it is the fix.",
+    content: `
+The most avoidable class of bug in a full-stack app is the two halves disagreeing about the shape of the data. The server expects a field the client does not send; the client renders a property the server renamed. In TrustPe and Swift Chat Connect I built specifically to make that impossible, using a **schema-first** approach with Zod. The principle: define each data shape **once**, and derive everything else — types, validation, forms — from that single definition.
+
+## The problem: the same shape, defined twice
+
+In a naive full-stack app, a "loan" or a "user" gets defined several times: a TypeScript \`interface\` on the client, a validation check on the server, maybe a database model, maybe a form's expectations. Each is a hand-written copy of the same idea. The moment one changes and the others do not, you have a bug that the compiler cannot see, because each copy is internally consistent — they are just inconsistent with *each other*.
+
+## The fix: one Zod schema as the source
+
+**Zod** is a validation library with a special property: a Zod schema both **validates data at runtime** and lets TypeScript **infer a static type** from it. So a single schema gives you two things that normally have to be kept in sync by hand — the runtime guard and the compile-time type.
+
+In TrustPe, the Zod schemas for the domain live in a **shared package** (\`shared/\`), imported by the backend, the admin panel, and the mobile app alike as \`@shared/*\`. The shape of a loan is written **once**, in one file, and:
+
+- the **backend** validates incoming requests against it,
+- the **client** gets the TypeScript type inferred from it, for free,
+- and every app reads the *same* definition, so there is nothing to keep in sync.
+
+Change the schema, and TypeScript immediately flags every place across all four apps that no longer matches. The inconsistency becomes a compile error instead of a production surprise.
+
+## Deriving the schema from the database
+
+Swift Chat Connect takes the same idea from the other direction. There, the database schema is defined in Drizzle, and \`drizzle-zod\` **generates** the Zod validation schemas from the table definitions. So the flow is: define the table once, get the database structure, the inferred TypeScript types, *and* the runtime validators — all from that one definition. The database, the types, and the validation cannot drift because two of them are generated from the third.
+
+Both projects reach the same destination by different roads: **one definition, many derived artifacts.** TrustPe starts from a shared Zod schema; Swift Chat Connect starts from a Drizzle table and generates the Zod. Either way, nothing is hand-copied.
+
+## Why this is worth the setup
+
+Schema-first has a small up-front cost — you have to structure the project so the schema is shared, and you have to define it deliberately. The payoff is that an entire category of bug disappears:
+
+- **No drift.** Client and server literally cannot disagree about a shape they both import from one source.
+- **Validation is not optional or forgotten.** The same schema that types the data also validates it, so untrusted input is checked at the boundary as a matter of course.
+- **Refactoring is safe.** Rename or retype a field, and the type system marches you through every consumer that needs updating.
+
+## The principle underneath
+
+This is really an application of "single source of truth" to data shape. The reason the two halves of an app drift is that the shape was written down in more than one place. Write it down once — as a Zod schema, or a Drizzle table that generates one — and derive the types, the validators, and the forms from it. In a monorepo like TrustPe, where a backend, an admin panel, and a mobile app all handle the same loan, that single shared definition is not a nicety. It is what lets four apps evolve together without falling out of sync.
+`,
+  },
 ];
