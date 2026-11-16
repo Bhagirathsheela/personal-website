@@ -363,33 +363,26 @@ button:focus-visible {
     pointer-events: none;
 }
 
-.box_tag::before,
-.box_tag::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    display: block;
-    border: 5px solid var(--brand-dark);
-    border-top-color: transparent;
-    border-left-color: transparent;
-}
-
-.box_tag::before { top: 0; left: 82px; }
-.box_tag::after { bottom: 28px; left: 0; }
-
+/* The band is centred on the corner diagonal: its centre must sit at
+   (C, C) so the clipped window is symmetric and centred text cannot be
+   cut on one side. C = 42, band height = 6 + 16 + 6 = 28.
+   top = C - height/2 = 28; left = C - width/2 = -58.
+   Visible band length = 2 * C * sqrt(2) = ~119px. */
 .box_tag_text {
     position: absolute;
-    left: -62px;
-    top: 24px;
-    width: 190px;
+    top: 28px;
+    left: -58px;
+    width: 200px;
     padding: 6px 0;
     background-color: var(--brand-dark);
     color: #fff;
-    font-size: 11px;
+    font-size: 10.5px;
+    line-height: 16px;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     text-align: center;
     text-transform: uppercase;
+    white-space: nowrap;
     transform: rotate(-45deg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
 }

@@ -90,12 +90,14 @@ export const liveProjects = [
     language: "Android",
     stack: "React Native · Expo · Firebase",
     title: "RadioDost",
-    status: "testing",
-    statusText: "In testing",
+    status: "live",
+    statusText: "Live on Play Store",
     intro:
       "Akashvani and free Indian stations behind a tuning dial you turn with your thumb, with proper background playback so it keeps going when the screen locks. Every stream in the catalogue is checked on each build, because dead radio URLs are the whole problem with these apps.",
-    linkBtnTxt: "Visit site",
-    link: "https://radiodost.web.app",
+    linkBtnTxt: "Play Store",
+    link: "https://play.google.com/store/apps/details?id=com.bhagirath.radiodost",
+    secondaryTxt: "radiodost.web.app",
+    secondaryLink: "https://radiodost.web.app",
   },
   {
     language: "YouTube",
