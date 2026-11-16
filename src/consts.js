@@ -11,12 +11,12 @@ export function scrollIntoViews(selectorQuery) {
 
 export const profile = {
   name: "Bhagirath Sheela",
-  role: "Senior frontend developer",
-  tagline: "Senior frontend developer. I design, build and run my own Android apps on the side.",
+  role: "Full-stack developer",
+  tagline: "Full-stack developer. I design, build and run my own Android apps on the side.",
   email: "bhagirathsheela001@gmail.com",
   phone: "+91 96109 28997",
   about:
-    "I'm a senior frontend developer. My day job is production React work — the kind where performance, accessibility and code that other people have to maintain all matter. Outside of it I build and run my own Android apps end to end: the React Native app, the Node backend behind it, the Play Store listing, and all the unglamorous work that follows a launch. Four of them are on the Play Store. Along the way I've also shipped Chrome extensions and sites for small businesses.",
+    "I'm a full-stack developer. My day job is production web work across the whole stack — React on the front, the APIs and data behind it. Outside of it I build and run my own Android apps end to end: the React Native app, the Node backend, the Play Store listing, and all the unglamorous work that follows a launch. Four of them are on the Play Store. Along the way I've also shipped Chrome extensions and sites for small businesses.",
 };
 
 export const socialLinks = [

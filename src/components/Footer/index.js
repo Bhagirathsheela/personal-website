@@ -31,9 +31,9 @@ const Footer = () => {
         <h2 className="title_text">Get in touch</h2>
 
         <p className="content_text">
-          I'm always happy to talk shop — React and frontend architecture, React
-          Native, or what it actually takes to get an app onto the Play Store
-          and keep it there. Email is the quickest way to reach me.
+          I'm always happy to talk shop — React, Node and how to put the two
+          together, React Native, or what it actually takes to get an app onto
+          the Play Store and keep it there. Email is the quickest way to reach me.
         </p>
 
         <ul className="contact_list">
