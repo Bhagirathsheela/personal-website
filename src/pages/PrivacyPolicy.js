@@ -1,61 +1,78 @@
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { profile } from "../consts";
+
 export default function PrivacyPolicy() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="privacy-wrapper">
+    <main className="privacy-page">
+      <div className="privacy-wrapper">
+        <Link to="/" className="privacy-back">
+          ← Back to home
+        </Link>
 
-      <h1>Privacy Policy</h1>
-      <p>
-        This Privacy Policy explains how we collect, use, and protect your
-        information when you visit and use this website.
-      </p>
-
-      <div className="privacy-section">
-        <h2>Information We Collect</h2>
-        <p>
-          We do not collect any personally identifiable information unless you
-          explicitly provide it (for example, through a contact form).
+        <h1>Privacy Policy</h1>
+        <p className="privacy-lede">
+          This is a personal portfolio site. It has no accounts, no comments, no
+          contact form and no advertising, so there is very little to say here —
+          but here it is in full.
         </p>
+
+        <div className="privacy-section">
+          <h2>What this site collects</h2>
+          <p>
+            Nothing. There is no analytics script, no advertising, no tracking
+            pixel and no cookie set by this site. Nothing you do here is recorded
+            or stored.
+          </p>
+        </div>
+
+        <div className="privacy-section">
+          <h2>What your browser sends anyway</h2>
+          <p>
+            Like any website, the server hosting these files receives a standard
+            web request when you open a page — your IP address, browser and the
+            page you asked for. That is handled by the hosting provider as part
+            of serving the site, and it isn't used to build any profile of you.
+          </p>
+        </div>
+
+        <div className="privacy-section">
+          <h2>Links to other places</h2>
+          <p>
+            This site links out to the Google Play Store, the Chrome Web Store,
+            YouTube, GitHub, LinkedIn and the individual app websites. Once you
+            follow one of those links you are on someone else's site, under their
+            privacy policy, not this one.
+          </p>
+          <p>
+            My apps — KundliDost, Bakkar, JobCatch and RadioDost — each have their
+            own privacy policy, because unlike this site they really do handle
+            your data. Those policies live on each app's own website and in its
+            Play Store listing.
+          </p>
+        </div>
+
+        <div className="privacy-section">
+          <h2>Changes</h2>
+          <p>
+            If this ever changes — if I add analytics, for example — I'll update
+            this page to say so rather than quietly leave it out of date.
+          </p>
+        </div>
+
+        <div className="privacy-section">
+          <h2>Questions</h2>
+          <p>
+            Email me at{" "}
+            <a href={`mailto:${profile.email}`}>{profile.email}</a> and I'll
+            answer.
+          </p>
+        </div>
       </div>
-
-      <div className="privacy-section">
-        <h2>Google AdSense & Cookies</h2>
-        <p>
-          This website uses Google AdSense which uses cookies to show personalized
-          ads based on your visits to this and other websites.
-        </p>
-        <p>
-          Users may opt out of personalized ads by visiting: https://adssettings.google.com
-        </p>
-      </div>
-
-      <div className="privacy-section">
-        <h2>Third-Party Services</h2>
-        <p>
-          Third-party ad networks may use cookies, JavaScript, or Web Beacons to
-          measure ads effectiveness or personalize content.
-        </p>
-      </div>
-
-      <div className="privacy-section">
-        <h2>Data Protection</h2>
-        <p>
-          We do not sell, trade, or transfer your personal information to outside parties.
-        </p>
-      </div>
-
-      <div className="privacy-section">
-        <h2>Changes to This Policy</h2>
-        <p>
-          We may update this Privacy Policy occasionally. Updates will be posted here.
-        </p>
-      </div>
-
-      <div className="privacy-section">
-        <h2>Contact Us</h2>
-        <p>
-          If you have any questions, please contact us using the Contact page.
-        </p>
-      </div>
-
-    </div>
+    </main>
   );
 }

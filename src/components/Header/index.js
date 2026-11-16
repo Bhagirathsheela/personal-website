@@ -1,96 +1,67 @@
 import React, { useState } from "react";
-import { scrollIntoViews } from "../../consts";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { scrollIntoViews } from "../../consts";
+
+const NAV_ITEMS = [
+  { label: "Home", target: ".home" },
+  { label: "Work", target: ".projects" },
+  { label: "Education", target: ".education" },
+  { label: "Contact", target: ".custom_footer" },
+];
 
 const Header = () => {
-  const [show, setShow] = useState(false);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const goHomeAndScroll = (selector) => {
-    // If not already on home, go to home first
+  const goToSection = (selector) => {
+    setOpen(false);
+
     if (location.pathname !== "/") {
-      navigate("/");
-      setTimeout(() => scrollIntoViews(selector), 200);
-    } else {
-      scrollIntoViews(selector);
+      navigate("/", { state: { scrollTo: selector } });
+      window.requestAnimationFrame(() => scrollIntoViews(selector));
+      return;
     }
-    setShow(false);
+
+    scrollIntoViews(selector);
   };
 
   return (
     <nav className="navbar">
-      <span className="navbar-toggle-btn">
-        <i
-          className="three_bars"
-          onClick={() => setShow(!show)}
-        >
-          <svg
-            className="svg-inline--fa fa-bars fa-w-14"
-            aria-hidden="true"
-            data-prefix="fas"
-            data-icon="bars"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-          >
-            <path
-              fill="currentColor"
-              d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
-            />
-          </svg>
-        </i>
-      </span>
-     <Link to="/" className="logo"></Link>
-      <ul className={`main-nav ${show ? "active-bar" : ""}`}>
-        <li>
-          <a
-            href="#"
-            className="nav-links"
-            onClick={(e) => {
-              e.preventDefault();
-              goHomeAndScroll(".home");
-            }}
-          >
-            Home
-          </a>
-        </li>
+      <Link
+        to="/"
+        className="logo"
+        aria-label="Bhagirath Sheela — home"
+        onClick={() => setOpen(false)}
+      />
 
-        <li>
-          <a
-            href="#"
-            className="nav-links"
-            onClick={(e) => {
-              e.preventDefault();
-              goHomeAndScroll(".skills");
-            }}
-          >
-            Projects
-          </a>
-        </li>
+      <button
+        type="button"
+        className="navbar-toggle-btn"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-controls="main-nav"
+        aria-label={open ? "Close menu" : "Open menu"}
+      >
+        <span className={`burger${open ? " burger_open" : ""}`} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+      </button>
 
-        <li>
-          <a
-            href="#"
-            className="nav-links"
-            onClick={(e) => {
-              e.preventDefault();
-              goHomeAndScroll(".custom_footer");
-            }}
-          >
-            Contact
-          </a>
-        </li>
-
-        <li>
-          <Link
-            to="/blog"
-            className="nav-links"
-            onClick={() => setShow(false)}
-          >
-            Blog
-          </Link>
-        </li>
+      <ul id="main-nav" className={`main-nav ${open ? "active-bar" : ""}`}>
+        {NAV_ITEMS.map((item) => (
+          <li key={item.label}>
+            <button
+              type="button"
+              className="nav-links"
+              onClick={() => goToSection(item.target)}
+            >
+              {item.label}
+            </button>
+          </li>
+        ))}
       </ul>
     </nav>
   );
